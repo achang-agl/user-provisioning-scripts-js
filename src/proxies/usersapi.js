@@ -7,6 +7,7 @@ async function createUser(userInfo) {
     name: userInfo.NAME,
     email: userInfo.EMAIL,
     password: userInfo.password,
+    divisionId: userInfo.divisionId
   };
 
   try {
