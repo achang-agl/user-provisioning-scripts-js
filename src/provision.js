@@ -9,6 +9,7 @@ const phoneBaseApiProxy = require('./proxies/phonebaseapi');
 const phoneApiProxy = require('./proxies/phoneapi');
 const rolesApiProxy = require('./proxies/rolesapi');
 const stationsApiProxy = require('./proxies/stationsapi');
+const divisionApiProxy = require('./proxies/divisionsapi');
 
 /**
  * Takes a list of users (sourced from a csv file) and assigns them to a chat group
@@ -60,7 +61,7 @@ async function createUser(user) {
   user.site = await sitesApiProxy.getSiteByName(user.SITENAME);
   user.role = await rolesApiProxy.getRoleByName(user.ROLE);
   user.phonebase = await phoneBaseApiProxy.getPhoneBaseByName(user.PHONEBASE);
-
+  user.divisionId = await divisionApiProxy.getDivisionByName(user.DIVISION);
   return user;
 }
 
@@ -119,6 +120,7 @@ async function createUsersService(userRequest) {
     ROLE: userRequest.role,
     SITENAME: userRequest.sitename,
     PHONEBASE: userRequest.phonebase,
+    DIVISION: userRequest.division
   };
 
   try {
