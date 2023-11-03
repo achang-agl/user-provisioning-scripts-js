@@ -55,13 +55,17 @@ async function assignUsersToRoles(users) {
  * @param {*} user 
  */
 async function createUser(user) {
+  console.log(user);
+  user.divisionId = await divisionApiProxy.getDivisionByName(user.DIVISION);
   const createdUser = await usersApiProxy.createUser(user);
   user.id = createdUser.id;
   user.group = await groupsApiProxy.getGroupByName(user.GROUP);
   user.site = await sitesApiProxy.getSiteByName(user.SITENAME);
   user.role = await rolesApiProxy.getRoleByName(user.ROLE);
   user.phonebase = await phoneBaseApiProxy.getPhoneBaseByName(user.PHONEBASE);
-  user.divisionId = await divisionApiProxy.getDivisionByName(user.DIVISION);
+  
+  console.log("This should be the divisionId:");
+  console.log(user.divisionId)
   return user;
 }
 
@@ -128,7 +132,7 @@ async function createUsersService(userRequest) {
     const userResults = await createUser(user);
 
     const users = [user];
-    await postUserCreation(user);
+    await postUserCreation(users);
   } catch (e) {
     console.error(e);
   }

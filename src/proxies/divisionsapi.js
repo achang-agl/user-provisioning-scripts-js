@@ -1,14 +1,20 @@
 const platformClient = require('purecloud-platform-client-v2');
 
 async function getDivisionByName(divisionName) {
-    switch(divisionName) {
-        case "CTL_Repair_Vendor":
-            return "6d043eba-faf5-497a-8845-9cc7c57db529";
-        case "CenturyLink":
-            return "39398b47-732a-4921-8ff7-8fbb5529219c";
-        case "SPC_VXI":
-            return "81708110-4a00-407b-9acd-180857a48a45";
-        default: return null;
+    const opts = {
+        name: divisionName
+    };
+
+    const apiInstance = new platformClient.ObjectsApi();
+
+    try {
+        const division = await apiInstance.getAuthorizationDivisions(opts);
+        console.log("divisionId:")
+        console.log(division.entities[0].id);
+        return division.entities[0].id;
+    } catch (err) {
+        console.error(`Error while retrieving division with name: ${logicalName}.`, err);
+        return null;
     }
 };
 
