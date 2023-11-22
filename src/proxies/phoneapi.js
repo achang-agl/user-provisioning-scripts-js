@@ -3,7 +3,7 @@ const platformClient = require('purecloud-platform-client-v2');
 async function createWebRTCPhone(user) {
   let apiInstance = new platformClient.TelephonyProvidersEdgeApi();
   const phone = {
-    name: `${user.NAME.replace(' ', '_')}_WEBRTC_PHONE`,
+    name: user.NAME,
     state: 'active',
     site: {
       id: user.site.id,

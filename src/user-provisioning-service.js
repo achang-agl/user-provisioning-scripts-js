@@ -22,13 +22,7 @@ app.use(bodyParser.json());
 
 app.post('/user', async (req, res) => {
   Object.keys(req.body).forEach((prop)=> console.log(prop));
-  console.log(req.body.name);
-  console.log(req.body.email);
-  console.log(req.body.password);
-  console.log(req.body.role);
-  console.log(req.body.sitename);
-  console.log(req.body.phonebase);
-  console.log(req.body.division);
+  console.log(req.body.delete == true);
   await provision.createUsersService(req.body);
   res.statusCode = 202;
   res.send({ status: 'Accepted' });

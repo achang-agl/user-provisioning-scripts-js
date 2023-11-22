@@ -116,6 +116,41 @@ async function createUsers(filename) {
  * @param {*} userRequest 
  */
 async function createUsersService(userRequest) {
+  let userExists = false;
+  let userId;
+  let currentState;
+  const states = ["active","inactive","deleted"];
+  console.log(userRequest);
+  if (userRequest.delete == true) {
+    try {
+      for (const state of states) {
+        const existingUser = await usersApiProxy.searchUser(userRequest.email, state);
+        if (existingUser.total == 1) {
+          userExists = true;
+          userId = existingUser.results[0].id;
+          currentState = state;
+          break;
+        }
+      }
+      if (userExists) {
+        switch(currentState) {
+          case "deleted":
+            console.log(`User already deleted.`)
+            break;
+          case "inactive":
+          case "active":
+            console.log(`Deleting ${currentState} user...`)
+            const userResults = await usersApiProxy.deleteUser(userId);
+            break;
+          default:
+          //throw error
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return;
+  }
   const user = {
     NAME: userRequest.name,
     EMAIL: userRequest.email,
@@ -127,12 +162,44 @@ async function createUsersService(userRequest) {
     DIVISION: userRequest.division
   };
 
+  //If the user's UPN already exists in Genesys, patch call to change state.
   try {
-    console.log(`Creating a user`);
-    const userResults = await createUser(user);
-
-    const users = [user];
-    await postUserCreation(users);
+    
+    let userExists = false;
+    let userId;
+    let userVersion;
+    let currentState;
+    for (const state of states) {
+      const existingUser = await usersApiProxy.searchUser(userRequest.email, state);
+      if (existingUser.total == 1) {
+        userExists = true;
+        userId = existingUser.results[0].id;
+        userVersion = existingUser.results[0].version;
+        console.log(existingUser.results[0].id);
+        currentState = state;
+        break;
+      }
+    }
+    if (userExists) {
+      switch(currentState) {
+        case "active":
+          console.log(`User already exists.`)
+          break;
+        case "inactive":
+        case "deleted":
+          console.log(`User was inactive/deleted. Restoring the account.`)
+            const userResults = await usersApiProxy.restoreUser(userId, userVersion);
+            console.log(userResults)
+          break;
+        default:
+          //throw error
+      }
+    } else {
+      console.log(`Creating a user`);
+      const userResults = await createUser(user);
+      const users = [user];
+      await postUserCreation(users);
+    }
   } catch (e) {
     console.error(e);
   }
